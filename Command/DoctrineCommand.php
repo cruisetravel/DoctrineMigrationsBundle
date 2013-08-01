@@ -34,6 +34,10 @@ abstract class DoctrineCommand extends BaseCommand
 {
     public static function configureMigrations(ContainerInterface $container, Configuration $configuration)
     {
+        if (is_null($configuration->getMigrationsNamespace())) {
+            $configuration->setMigrationsNamespace($container->getParameter('doctrine_migrations.namespace'));
+        }
+
         $dir = $configuration->getMigrationsDirectory();
 
         if (is_null($dir)) {
@@ -45,10 +49,6 @@ abstract class DoctrineCommand extends BaseCommand
 
         if (!file_exists($dir)) {
             mkdir($dir, 0777, true);
-        }
-
-        if (is_null($configuration->getMigrationsNamespace())) {
-            $configuration->setMigrationsNamespace($container->getParameter('doctrine_migrations.namespace'));
         }
 
         if (is_null($configuration->getName())) {
