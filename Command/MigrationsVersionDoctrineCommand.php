@@ -40,6 +40,7 @@ class MigrationsVersionDoctrineCommand extends VersionCommand
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        DoctrineCommand::fetchParameters($this->getApplication()->getKernel()->getContainer(), $input);
         DoctrineCommandHelper::setApplicationEntityManager($this->getApplication(), $input->getOption('em'));
 
         $configuration = $this->getMigrationConfiguration($input, $output);
