@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Doctrine\Bundle\DoctrineBundle\Command\DoctrineCommand as BaseCommand;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
+use Symfony\Component\Console\Input\InputInterface;
 
 /**
  * Base class for Doctrine console commands to extend from.
@@ -71,6 +72,27 @@ abstract class DoctrineCommand extends BaseCommand
             $migration = $version->getMigration();
             if ($migration instanceof ContainerAwareInterface) {
                 $migration->setContainer($container);
+            }
+        }
+    }
+
+    public static function fetchParameters(ContainerInterface $container, InputInterface $input)
+    {
+        $dir = $input->getOption('configuration');
+        if (!empty($dir)) {
+            $settings = $container->getParameter('doctrine_migrations');
+            $configurations = array();
+            if (array_key_exists('configs', $settings)) {
+                $configurations = $settings['configs'];
+                if (array_key_exists($dir, $configurations)) {
+                    $configuration = $configurations[$dir];
+                    if (array_key_exists('file', $configuration)) {
+                        $input->setOption('configuration', $configuration['file']);
+                    }
+                    if (array_key_exists('em', $configuration)) {
+                        $input->setOption('em', $configuration['em']);
+                    }
+                }
             }
         }
     }
